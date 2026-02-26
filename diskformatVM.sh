@@ -18,7 +18,7 @@ parted -s $1 mklabel gpt
 
 # Create efi partition
 echo "Creating $1 EFI partition..."
-parted -s -a optimal $11 mkpart primary fat32 2048s 1G
+parted -s -a optimal $1 mkpart primary fat32 2048s 1G
 
 # Create root partition
 echo "Creating linux partition on rest of free space..."
