@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# this script is a reference because it is what is required to be entered before the installation scripts can be downloaded/cloned
+
+xbps-install -uy xbps
+xbps-install -Sy vim git parted
+
+mkdir /install
+cd /install
+git clone https://github.com/jerod256/voidinstall_secure.git
+
+# Reference of installation scripts
+# README.md - overview, informational, not functional
+# primexbps.ref - this file. a reference script only, must be manually entered to get the installation scripts
+# primeinstall.sh - this makes the installation scripts executable so they may be called and run
+# diskformatVM.sh - this script prepares the target drive for installation, partitions, formats and mounts in preparation for the rest of installation

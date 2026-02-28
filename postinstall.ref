@@ -1,0 +1,3 @@
+#!/bin/bash
+# This is a reference script for the post installation scripts and makes them executable for post installation
+# assumes that secure boot was activated in the last reboot. DO NOT EXECUTE THIS SCRIPT IF SECURE BOOT WAS NOT ACTIVATED.
