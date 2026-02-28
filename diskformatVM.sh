@@ -22,7 +22,7 @@ parted -s -a optimal $1 mkpart primary fat32 2048s 1G
 
 # Create root partition
 echo "Creating linux partition on rest of free space..."
-parted -s -a optimal $1 mkpart primary ext4 $EFI_SIZE 100%
+parted -s -a optimal $1 mkpart primary ext4 1G 100%
 
 # Set esp on efi partition
 echo "Setting esp flag on EFI partition..."
