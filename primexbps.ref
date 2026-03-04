@@ -3,7 +3,7 @@
 # this script is a reference because it is what is required to be entered before the installation scripts can be downloaded/cloned
 
 xbps-install -Suy xbps
-xbps-install -Sy vim git parted
+xbps-install -Sy vim git parted cryptsetup
 
 mkdir /install
 cd /install
@@ -14,10 +14,10 @@ git clone https://github.com/jerod256/voidinstall_secure.git
 #partition disk with 2 partitions, 1 1GB for EFI, 1 for the rest
 
 #then encrypt the second volume
-cryptsetup --label cryptroot --type luks2 --cipher aes-xts-plain64 --key-size 512 --hash sha512 --iter-time 1000 --use-random luksformat /dev/vda2
+cryptsetup --label cryptroot --type luks2 --cipher aes-xts-plain64 --key-size 512 --hash sha512 --iter-time 1000 --use-random luksFormat /dev/vda2
 
 #open the encrypted volume
-cryptsetup open --allow-discards --type luks /dev/vda2 cryptroot
+cryptsetup luksOpen --allow-discards --type luks /dev/vda2 cryptroot
 
 #then run the disk setup script by passing the EFI partition as the first parameter and the luks partition as the second
 # example ./diskformatVM.sh /dev/vda1 /dev/mapper/cryptroot
