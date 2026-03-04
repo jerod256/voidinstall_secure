@@ -1,4 +1,4 @@
-cd voidinstall_secure/
+#cd voidinstall_secure/
 
 chmod +x ./diskformatVM.sh
 #chmod +x ./
