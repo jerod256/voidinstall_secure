@@ -87,3 +87,27 @@ mount /dev/cryptgroup/home /mnt/home
 echo "mounting EFI stub directory..."
 mkdir -p /mnt/boot
 mount $1 /mnt/boot
+
+# make the folder for the xbps keys and copy them over
+mkdir -p /mnt/var/db/xbps/keys
+cp /var/db/xbps/keys/* /mnt/var/db/xbps/keys/
+
+# install base system and required utilities into the target system
+XBPS_ARCH=x86_64 xbps-install -Sfy -R https://repo-default.voidlinux.org/current -R https://repo-default.voidlinux.org/current/nonfree -r /mnt base-system lvm2 cryptsetup refind efibootmgr sbctl sbsigntool efitools seatd bluez dbus pipewire wireplumber sbsigntool tlp tpm2-tools Vulkan-Tools
+# installing refind just in case the EFI stub is not recognized by the BIOS
+# it can be bypassed if the BIOS sees the EFI stub
+
+# generate the filesystem table
+xgenfstab /mnt > /mnt/etc/fstab
+
+# Checklist for installation setup
+# - setup dracut to:
+#  - make a UKI - and place in the unencrypted boot partition
+#  - the UKI will be seen by the BIOS, set by the efibootmgr
+#  - the UKI will unlock the encrypted root drive
+#  - the UKI will find the filesystem and boot
+#  - update the UKI to the rolling release kernel
+# - secure boot tools signs the UKI
+#  - put hooks into dracut to resign the UKI with any initramfs/kernel update
+# - reboot and activate the secure boot and make sure its ok with the UKI
+# - move keys into TPM2 and set TPM to unlock with TPM pin
