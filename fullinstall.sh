@@ -138,7 +138,7 @@ echo "$CRYPTPASS1" | cryptsetup open --allow-discards --type luks /dev/${disk}2 
 ### LVM Setup
 ### Make root partition into an LV group
 echo "creating logical volume group on root partition..."
-vgcreate cryptgroup /dev/${disk}2 
+vgcreate cryptgroup /dev/mapper/cryptroot 
 echo "creating root logical volume..."
 lvcreate --name root -L 10G cryptgroup
 echo "creating swap logical volume..."
