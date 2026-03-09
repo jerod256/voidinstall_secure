@@ -21,7 +21,7 @@
 ### # mkdir /install
 ### # cd /install
 ### # xbps-install -Sfu xbps
-### # xbps-install -Sfy parted git
+### # xbps-install -Sfy parted git vim #vim is for checking scripts
 ### # git clone https://github.com/jerod256/voidinstall_secure.git
 ### # cd voidinstall_secure
 ### # chmod +x fullinstall.sh
@@ -172,3 +172,11 @@ echo "mounting EFI stub directory..."
 mkdir -p /mnt/boot/efi
 mount /dev/${disk}1 /mnt/boot/efi
 
+
+# a temporary block of code to make sure entries are properly captured
+echo $PASS1
+echo $USER
+echo $CRYPTPASS1
+echo $disk
+# remember to delete afterwards
+lsblk
