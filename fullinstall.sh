@@ -44,9 +44,10 @@ default_CRYPTPASS="56789"
 ### packages to be loaded into the live session for installation (seems to be required manually before this script is run)
 #pkg_preinst="parted git"
 #package list for basic system setup
-pkg_base="base-system cryptsetup efibootmgr nftables networkmanager sbctl vim git lvm2 refind sbsigntool efitools tpm2-tools"
+#rEFInd is added just in case. can be removed later if the EFI is enrolled properly and boot works
+pkg_base="base-system cryptsetup efibootmgr nftables sbctl vim git lvm2 refind sbsigntool efitools tpm2-tools"
 ### package list for system utilities, daemons, drivers, etc
-pkg_sysutils="greetd tui-greet tlp base-devel bluez git wget curl git btop udisksctl ufw"
+pkg_sysutils="NetworkManager greetd tui-greet tlp base-devel bluez git wget curl git btop udisksctl ufw"
 ### package list for graphical desktop environment
 pkg_gui="seatd pipewire wireplumber xdg_desktop_portal_wlroots polkit dbus fuzzel wl-clipboard swaybg waybar swaylock swayidle grim slurp wiremix bluetui nwg-look nwg-drawer kitty foot ffmpeg firefox"
 
