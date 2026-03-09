@@ -182,7 +182,7 @@ cp /var/db/xbps/keys/* /mnt/var/db/xbps/keys/
 
 ### installation of base system and packages
 echo "installing base system..."
-XBPS_ARCH=arch xbps-install -Sfy -R $mirror -R $mirror_nonfree -r /mnt $pkg_base
+xbps-install -Sy -R $mirror -R $mirror_nonfree -r /mnt $pkg_base
 
 
 ### generate the filesystem table
