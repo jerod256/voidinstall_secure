@@ -46,7 +46,7 @@ default_CRYPTPASS="56789"
 #package list for basic system setup
 pkg_base="base-system cryptsetup efibootmgr nftables networkmanager sbctl vim git lvm2 refind sbsigntool efitools tpm2-tools"
 ### package list for system utilities, daemons, drivers, etc
-pkg_sysutils="tlp base-devel bluez git wget curl git btop udisksctl"
+pkg_sysutils="greetd tui-greet tlp base-devel bluez git wget curl git btop udisksctl ufw"
 ### package list for graphical desktop environment
 pkg_gui="seatd pipewire wireplumber xdg_desktop_portal_wlroots polkit dbus fuzzel wl-clipboard swaybg waybar swaylock swayidle grim slurp wiremix bluetui nwg-look nwg-drawer kitty foot ffmpeg firefox"
 
@@ -128,11 +128,11 @@ parted -s /dev/${disk} set 1 esp on
 
 ### Encrypt root partition
 echo "Encrypt root partition with LUKS2 aes-512..."
-echo "$CRYPTPASS1" | cryptsetup --label crypt --type luks2 --cipher aes-xts-plain64 --key-size 512 --hash sha512 --iter-time 1000 --use-random luksFormat /dev/${disk}2
+echo "$CRYPTPASS1" | cryptsetup --label crypt --type luks2 --cipher aes-xts-plain64 --key-size 512 --hash sha512 --iter-time 1000 --use-random luksFormat /dev/${disk}2 -
 
 ### Open encrypted partition
 echo "Opening crypt partition..."
-echo "$CRYPTPASS1" | cryptsetup open --allow-discards --type luks /dev/${disk}2 cryptroot
+echo "$CRYPTPASS1" | cryptsetup open --allow-discards --type luks /dev/${disk}2 cryptroot -
 
 
 ### LVM Setup
@@ -173,10 +173,42 @@ mkdir -p /mnt/boot/efi
 mount /dev/${disk}1 /mnt/boot/efi
 
 
-# a temporary block of code to make sure entries are properly captured
+###### TO TEST NEXT
+
+### make the folder for the xbps keys and copy them over
+echo "copying over xbps keys"
+mkdir -p /mnt/var/db/xbps/keys
+cp /var/db/xbps/keys/* /mnt/var/db/xbps/keys/
+
+### installation of base system and packages
+echo "installing base system..."
+XBPS_ARCH=arch xbps-install -Sfy -R $mirror -R $mirror_nonfree -r /mnt $pkg_base
+
+
+### generate the filesystem table
+echo "generating filesystem table..."
+xgenfstab /mnt > /mnt/etc/fstab
+
+chroot /mnt chown root:root /
+chroot /mnt chmod 755 /
+echo "LANG=en_US.UTF-8" > /mnt/etc/local.conf
+echo "en_US.UTF-8 UTF-8" >> /mnt/etc/default/libc-locales
+
+chroot /mnt chpasswd <<< "root:$PASS1"
+chroot /mnt useradd -m -G wheel,audio,video,cdrom,optical,storage,kvm,input,plugdev,users,xbuilder,bluetooth,_pipewire,_seatd -s /bin/bash $USER
+chroot /mnt chpasswd <<< "$USER:$PASS1"
+chroot /mnt sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
+
+### a temporary block of code to make sure entries are properly captured
 echo $PASS1
 echo $USER
 echo $CRYPTPASS1
 echo $disk
 # remember to delete afterwards
 lsblk
+
+### wipes passwords so they don't exist in memory
+unset PASS1
+unset PASS2
+unset CRYPTPASS1
+unset CRYPTPASS2
