@@ -45,7 +45,7 @@ default_CRYPTPASS="56789"
 #pkg_preinst="parted git"
 #package list for basic system setup
 #rEFInd is added just in case. can be removed later if the EFI is enrolled properly and boot works
-pkg_base="base-system cryptsetup efibootmgr nftables sbctl vim git lvm2 refind sbsigntool efitools tpm2-tools"
+pkg_base="base-system cryptsetup efibootmgr nftables sbctl vim git lvm2 grub-x86_64-efi sbsigntool efitools tpm2-tools"
 ### package list for system utilities, daemons, drivers, etc
 pkg_sysutils="NetworkManager greetd tui-greet tlp base-devel bluez git wget curl git btop udisksctl ufw"
 ### package list for graphical desktop environment
@@ -209,7 +209,7 @@ chroot /mnt sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /et
 ##### TO DO
 ### 1. determine if fstab needs UUIDs to be fixed in the file
 ### 2. setup crypttab
-### 3. setup rEFInd and EFI stub for boot
+### 3. setup GRUB and EFI stub for boot
 ### 4. begin dracut setup to create UKI
 
 
@@ -217,30 +217,35 @@ chroot /mnt sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /et
 ##### dracut configuration and UKI generation #####
 ###################################################
 #
+###
 
 
 ###################################################
-##### Boot options: EFI stub and rEFInd ###########
+##### Boot options: EFI stub and GRUB ###########
 ###################################################
 #
+### GRUB setup
 
 
 ###############################################
 ##### Secure boot setup and TPM enrolment #####
 ###############################################
 #
+###
 
 
 ######################################################
 ##### Moving system scripts (copying /etc files) #####
 ######################################################
 #
+###
 
 
 ################################################
 ##### Setup Services, Daemons and Security #####
 ################################################
 #
+###
 
 
 #####################################################################
