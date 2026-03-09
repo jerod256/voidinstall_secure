@@ -20,7 +20,7 @@
 ### to run this script, run the following manually:
 ### # mkdir /install
 ### # cd /install
-### # xbps-install -Su xbps
+### # xbps-install -Sfu xbps
 ### # xbps-install -Sfy parted git
 ### # git clone https://github.com/jerod256/voidinstall_secure.git
 ### # cd /voidinstall_secure
@@ -92,10 +92,10 @@ done
 ### 5. cryptsetup passphrase, will be used to decrypt root drive
 while true; do
 	echo -n "Enter encryption passphrase"
-	read -s PASS1
+	read -s CRYPTPASS1
 
 	echo -n "Verify passphrase"
-	read -s PASS2
+	read -s CRYPTPASS2
 
 	if [ "$PASS1" = "$PASS2" ]; then
 		echo "Passphrase successfully set."
@@ -125,6 +125,14 @@ parted -s -a optimal /dev/${disk} mkpart primary ext4 $efi_size 100%
 ### Set esp flag on efi partition
 echo "Setting esp flag on EFI partition..."
 parted -s /dev/${disk} set 1 esp on
+
+### Encrypt root partition
+echo "Encrypt root partition with LUKS2 aes-512..."
+echo "$CRYPTPASS1" | cryptsetup --label crypt --type luks2 --cipher aes-xts-plain64 --key-size 512 --hash sha512 --iter-time 1000 --use-random luksFormat ${disk}2
+
+### Open encrypted partition
+echo "Opening crypt partition..."
+echo "$CRYPTPASS1" | cryptsetup open --allow-discards --type luks ${disk}2 cryptroot
 
 
 ### LVM Setup
