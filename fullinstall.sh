@@ -44,7 +44,7 @@ default_CRYPTPASS="56789"
 ### packages to be loaded into the live session for installation (seems to be required manually before this script is run)
 #pkg_preinst="parted git"
 #package list for basic system setup
-pkg_base="base-system cryptsetup efibootmgr nftables networkmanager sbctl vim git"
+pkg_base="base-system cryptsetup efibootmgr nftables networkmanager sbctl vim git lvm2 refind sbsigntool efitools tpm2-tools"
 ### package list for system utilities, daemons, drivers, etc
 pkg_sysutils="tlp base-devel bluez git wget curl git btop udisksctl"
 ### package list for graphical desktop environment
@@ -54,21 +54,21 @@ pkg_gui="seatd pipewire wireplumber xdg_desktop_portal_wlroots polkit dbus fuzze
 ### 1. target disk label
 lsblk
 echo -n "Enter the name of the target disk as shown above [leave blank for default]"
-read -s temp_disk
+read -p temp_disk
 disk="${temp_disk:-$default_disk}"
 echo
 echo
 
 ### 2. EFI partition size
 echo -n "Enter the size of the partition [leave blank for default]"
-read -s temp_efisize
+read -p temp_efisize
 efi_size="${temp_efisize:-$default_efi_size}"
 echo
 echo
 
 ### 3. User name
 echo -n "Enter the username [leave blank for default]"
-read -s temp_username
+read -p temp_username
 USER="${temp_username:-$default_USER}"
 echo
 echo
@@ -125,3 +125,42 @@ parted -s -a optimal /dev/${disk} mkpart primary ext4 $efi_size 100%
 ### Set esp flag on efi partition
 echo "Setting esp flag on EFI partition..."
 parted -s /dev/${disk} set 1 esp on
+
+
+### LVM Setup
+### Make root partition into an LV group
+echo "creating logical volume group on root partition..."
+vgcreate cryptgroup ${disk}2 
+echo "creating root logical volume..."
+lvcreate --name root -L 10G cryptgroup
+echo "creating swap logical volume..."
+lvcreate --name swap -L 4G cryptgroup
+echo "creating home logical volume..."
+lvcreate --name home -l 80%FREE cryptgroup
+
+echo "Creating EFI filesystem FAT32..."
+mkfs.fat -F 32 -n EFI ${disk}1
+#mkfs.ext4 -L ROOT /dev/mapper/cryptroot
+
+echo "creating root filesystem ext4..."
+mkfs.ext4 -L root /dev/cryptgroup/root
+echo "creating swap filesystem..."
+mkswap /dev/cryptgroup/swap
+echo "mounting swap volume..."
+swapon /dev/cryptgroup/swap
+echo "creating home filesystem ext4..."
+mkfs.ext4 -L home /dev/cryptgroup/home
+
+### mount root and home
+echo "mounting root to target filesystem..."
+mount /dev/cryptgroup/root /mnt
+
+echo "mounting home to target filesystem..."
+mkdir -p /mnt/home
+mount /dev/cryptgroup/home /mnt/home
+
+# since the intention is to use an EFI stub for boot, only create a /mnt/boot folder and mount to EFI partition
+echo "mounting EFI stub directory..."
+mkdir -p /mnt/boot/efi
+mount ${disk}1 /mnt/boot/efi
+
