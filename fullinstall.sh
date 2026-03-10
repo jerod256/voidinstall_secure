@@ -17,6 +17,9 @@
 ### An EFI partition containing a UKI
 ### Target system is assumed to have capabilities for EFI stub, Secure boot and a TPM2 chip and use will be made of these features
 
+### This version will not have EFI stub, UKI, Secure boot or TPM2.
+### This is so I can work out a baseline installation and get to desktop faster.
+
 ### to run this script, run the following manually:
 ### # mkdir /install
 ### # cd /install
@@ -47,9 +50,9 @@ default_CRYPTPASS="56789"
 #rEFInd is added just in case. can be removed later if the EFI is enrolled properly and boot works
 pkg_base="base-system cryptsetup efibootmgr nftables sbctl vim git lvm2 grub-x86_64-efi sbsigntool efitools tpm2-tools"
 ### package list for system utilities, daemons, drivers, etc
-pkg_sysutils="NetworkManager greetd tui-greet tlp base-devel bluez git wget curl git btop udisksctl ufw"
+pkg_sysutils="NetworkManager greetd tuigreet tlp base-devel bluez git wget curl git btop udisks2 ufw"
 ### package list for graphical desktop environment
-pkg_gui="seatd pipewire wireplumber xdg_desktop_portal_wlroots polkit dbus fuzzel wl-clipboard swaybg waybar swaylock swayidle grim slurp wiremix bluetui nwg-look nwg-drawer kitty foot ffmpeg firefox"
+pkg_gui="seatd pipewire wireplumber xdg_desktop_portal_wlroots polkit dbus fuzzel wl-clipboard swaybg waybar swaylock swayidle grim slurp wiremix bluetui nwg-look nwg-drawer kitty foot ffmpeg firefox qutebrowser bemenu"
 
 ### gathers information
 ### 1. target disk label
@@ -209,26 +212,30 @@ chroot /mnt sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /et
 ##### TO DO
 ### 1. determine if fstab needs UUIDs to be fixed in the file
 ### 2. setup crypttab
-### 3. setup GRUB and EFI stub for boot
-### 4. begin dracut setup to create UKI
+### 3. setup GRUB
+### 4. begin dracut setup
+### 5. populate greetd config
 
 
 ###################################################
 ##### dracut configuration and UKI generation #####
+##### for now do not do UKI #######################
 ###################################################
 #
 ###
 
 
-###################################################
-##### Boot options: EFI stub and GRUB ###########
-###################################################
+#####################################################
+##### Boot options: EFI stub and GRUB ###############
+##### For now, just setup GRUB and not EFI Stub #####
+#####################################################
 #
 ### GRUB setup
 
 
 ###############################################
 ##### Secure boot setup and TPM enrolment #####
+##### Leave for now ###########################
 ###############################################
 #
 ###
@@ -238,7 +245,7 @@ chroot /mnt sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /et
 ##### Moving system scripts (copying /etc files) #####
 ######################################################
 #
-###
+### Start with greetd config
 
 
 ################################################
